@@ -1,0 +1,61 @@
+# Setup and configure ruby things for reddit app
+- name: "Reddit App: Configure app environment"
+  hosts: all
+  gather_facts: no
+  become: yes
+
+  tasks:
+  - name: Install ruby and rubygems and required packages
+    apt: "name={{ item }} state=present"
+    with_items:
+      - ruby-full
+      - ruby-dev
+      - build-essential
+
+  - name: Install Ruby bundler
+    gem:
+      name: bundler
+      state: present
+      user_install: no
+
+# Setup and configure mongodb for reddit app
+- name: "Reddit App: Install mongodb"
+  hosts: all
+  gather_facts: no
+  become: yes
+
+  tasks:
+  - name: Add key for mongodb package
+    apt_key:
+      keyserver: keyserver.ubuntu.com
+      id: EA312927
+  - name: Add Repo for mongodb
+    apt_repository: 
+      repo: deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse
+      state: present
+      filename: mongodb-org-3.2
+      update_cache: yes
+  - name: install mongodb
+    apt:
+      name: mongodb-org
+      state: present
+      update_cache: yes
+  - name: Make sure mongod is running
+    systemd:
+      state: started
+      name: mongod
+  - name: enable service mongod and ensure it is not masked
+    systemd:
+      name: mongod
+      enabled: yes
+      masked: no
+
+# Deploy reddit app
+- name: "Reddit App: Deploy application"
+  hosts: reddit_app
+  gather_facts: no
+
+  tasks:
+  - name: Remove me after adding real things
+    debug:
+      msg: "В этом сценарии нужно добавить модули для деплоя приложения, после можно удалить вызов модуля debug, который выводит это сообщение"
